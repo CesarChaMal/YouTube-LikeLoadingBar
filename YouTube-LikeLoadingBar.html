@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>YouTube like Loading bar</title>
+  
+  <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script> -->
+
+  <script type="text/javascript">
+	var options = [ "Opt1", "Opt2", "Opt3"];
+	// var options = [ "red", "blue", "cyan", "magenta"];
+		
+	var i = 0;
+	function move(id) {
+		if (i == 0) {
+			i = 1;
+			selectedNavBarOption(id);
+
+			var myProgress = document.getElementsByClassName("myProgress")[0];
+			myProgress.style.display = "block";
+			var myBar = document.getElementsByClassName("myBar")[0];
+			var width = 1;
+			// 30 x 100 = 3000 mileseconds = 3 seconds
+			intervalId = setInterval(animation, 30);
+			
+			function animation() {
+				if (width >= 100) {
+					clearInterval(intervalId);
+					myProgress.style.display = "none";
+					i = 0;
+					displayContent(id)
+				} else {
+					width++;
+					myBar.style.width = width + "%";
+				}
+			}
+
+		}
+	}
+
+	function displayContent(id) {
+		console.log(id);
+
+		var content = document.getElementById("content");
+		// content.innerHTML =  "Currently selected: > " + id + " <";
+
+		var pElement = document.createElement("p");
+		pElement.innerText = "Currently selected: ";
+
+		var oldText = content.textContent;
+		var start = oldText.indexOf(">");
+		var end = oldText.indexOf("<");
+		var idsText = "";
+		if (oldText === ""){
+			idsText = oldText.substring(start+1, end).trim();
+		} else {
+			idsText = oldText.substring(start+1, end).trim() + ",";
+		}
+
+		console.log("lastIdSelected: " + lastIdSelected);
+		if (lastIdSelected == "All"){
+			idsText = "";
+			lastIdSelected = id;
+		}
+		console.log("lastIdSelected: " + lastIdSelected);
+		console.log("oldText: " + oldText);
+		console.log("idsText: " + idsText);
+		content.innerHTML = "";
+
+		var separator = ",";
+		var text = "";
+		var idsString = "";
+
+		if (id == "All"){
+			idsString = options.join(separator)
+			text = "> " + idsString +" <";
+			lastIdSelected = "All";
+		} else {
+			text = "> " + idsText  + id + ", " + " <";
+			console.log("text: " + text)
+			var start = text.indexOf(">");
+			var end = text.indexOf("<");
+			var idsText = text.substring(start+1, end).trim();
+			console.log("idsText: " + idsText)
+			var ids = idsText.split(separator)
+			ids.pop()
+			ids = getDistinctArray(ids)
+			idsString = ids.join(separator)
+			console.log("idsString: " + idsString)
+			text = "> " + idsString + " <";
+			console.log("text: " + text)
+		}
+		var textNode = document.createTextNode(text);
+
+		content.appendChild(pElement);
+		content.appendChild(textNode);
+	}
+
+	function selectedNavBarOption(id) {
+		if (id == "All"){
+			clearNavBarOptions();
+		} else {
+			clearNavBarOptions(id);
+		}
+		
+		var a = document.getElementById(id);
+		a.className = 'active';
+	}
+
+	function clearNavBarOptions(id) {
+		var toolbar = document.getElementsByClassName("toolbar")[0];
+		var aElements = toolbar.getElementsByTagName("a");
+		for (var j = 0; j < aElements.length; j++) {
+			if (typeof id != 'undefined') {
+				if (aElements[j].id == "All"){
+					
+					aElements[j].className = 'noactive';
+				}
+			} else {
+				aElements[j].className = 'noactive';
+			}
+		}
+	}
+
+	function getDistinctArray(arr) {
+    	var dups = {};
+    	return arr.filter(function(el) {
+        	var hash = el.valueOf();
+        	var isDup = dups[hash];
+        	dups[hash] = true;
+        	return !isDup;
+    	});
+	}	
+
+	function createOptions() {
+		var body = document.getElementsByTagName("body")[0];
+		console.log(body)
+		console.log(body.style.width)
+		body.style.width = (options.length+1) + "00px"
+		console.log(options.length)
+		var toolbar = document.getElementsByClassName("toolbar")[0];
+		var ulElement = toolbar.getElementsByTagName("ul")[0];
+		ulElement.innerHTML = "<li><a id='All' class='active' href='#' onclick='move(this.id);'>All</a></li>"
+		for (var i = 0; i < options.length; i++) {
+			ulElement.innerHTML += "<li><a id='" + options[i] + "' href='#' onclick='move(this.id);'>" + options[i] + "</a></li>"
+		}
+	}
+
+  </script>
+
+  <style type="text/css">
+	body {
+		font-family: 'Open Sans', sans-serif;
+		/* 
+		margin:0;
+		padding:0; 
+		*/
+		margin: 0 auto;
+		height: 300px;
+		width: 400px;
+	}
+	.toolbar {
+		margin: 0;
+		padding: 0;
+	}
+	.toolbar ul {
+		list-style-type: none;
+		padding: 0;
+	}
+	.toolbar li {
+		display: inline;
+		float: left;
+	}
+	.toolbar a:link, .toolbar a:visited {
+		background-color: #03A9F4;
+		color: white;
+		display: block;
+		height: 50px;
+		width: 100px;
+		text-align: center;
+		padding: 10px 0;
+		font-weight: bold;
+		text-decoration: none;
+	}
+	.toolbar a:hover {
+		background-color: black;
+	}
+	.toolbar a.active {
+		background-color: black;
+	}
+	.toolbar a.noactive {
+		background-color:  #03A9F4;
+	}
+	.myProgress {
+		width: 100%;
+		background-color: lightgray;
+		display: none;
+	}
+	.myBar {
+		width: 1%;
+		height: 5px;
+		background-color: greenyellow;
+	}
+	.content {
+		text-align: center;
+		margin: 0;
+		padding: 0;
+		position: relative;
+		top: 20%;
+		/* left: 20%;  */
+	}
+   </style>
+
+  </head>
+  <body>
+	<div class="myProgress"><div class="myBar"></div></div>
+	<nav class="toolbar">
+		<ul>
+		<!-- 
+			<li><a id="All" class="active" href="#" onclick="move(this.id);">All</a></li>
+			<li><a id="Opt1" href="#" onclick="move(this.id);">Opt1</a></li>
+			<li><a id="Opt2" href="#" onclick="move(this.id);">Opt2</a></li>
+			<li><a id="Opt3" href="#" onclick="move(this.id);">Opt3</a></li> 
+		-->
+		</ul>
+	</nav>
+	<div id="content" class="content"></div>
+	<script type="text/javascript">
+		lastIdSelected = "All";
+		createOptions();
+		displayContent("All")
+	</script>
+
+	<!--
+	<br>
+	<button onclick="move()">Click Me</button> 	
+	-->
+  </body>
+</html>
